@@ -1,2 +1,2 @@
 # Macrosight
-sales intelligent system
+economic intelligent platform
