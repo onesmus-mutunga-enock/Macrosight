@@ -1,0 +1,177 @@
+Sale (Historical Fact)
+
+A Sale is a historical, immutable business fact.
+
+class Sale {
+  constructor(
+    public readonly productId: string,
+    public readonly date: Date,
+    public readonly quantity: number,
+    public readonly revenue: number
+  ) {
+    if (quantity <= 0) throw new Error("Quantity must be positive");
+    if (revenue < 0) throw new Error("Revenue cannot be negative");
+  }
+}
+
+Domain Rules
+
+A sale cannot change
+
+Quantity must be positive
+
+Revenue cannot be negative
+
+###############################################################
+Product (Business Entity)
+class Product {
+  constructor(
+    public readonly id: string,
+    public readonly name: string,
+    public readonly category: string
+  ) {}
+}
+
+
+Products exist independently of forecasts.
+###############################################################
+
+TimePeriod (Value Object)
+
+Time periods are critical in forecasting and must be explicit.
+
+class TimePeriod {
+  constructor(
+    public readonly start: Date,
+    public readonly end: Date
+  ) {
+    if (end <= start) {
+      throw new Error("End date must be after start date");
+    }
+  }
+}
+
+Why this matters
+
+Prevents invalid time windows
+
+Ensures consistent aggregation logic
+#############################################################
+ForecastMetric (Value Object)
+
+Forecasts must declare what they predict.
+
+type ForecastMetric = "REVENUE" | "UNITS";
+
+
+This prevents ambiguous forecasts.
+#####################################################################
+3.5 ForecastHorizon (Value Object)
+class ForecastHorizon {
+  constructor(public readonly monthsAhead: number) {
+    if (monthsAhead <= 0) {
+      throw new Error("Forecast horizon must be positive");
+    }
+  }
+
+  isLongTerm(): boolean {
+    return this.monthsAhead > 6;
+  }
+}
+#####################################################################
+3.6 Forecast (Core Aggregate Root)
+
+This is the heart of the domain.
+
+class Forecast {
+  constructor(
+    public readonly metric: ForecastMetric,
+    public readonly period: TimePeriod,
+    public readonly value: number,
+    public readonly lowerBound: number,
+    public readonly upperBound: number,
+    public readonly confidence: number
+  ) {
+    if (confidence <= 0 || confidence >= 1) {
+      throw new Error("Confidence must be between 0 and 1");
+    }
+    if (lowerBound > value || value > upperBound) {
+      throw new Error("Forecast bounds are invalid");
+    }
+  }
+}
+
+Domain Guarantees
+
+Confidence is meaningful
+
+Prediction lies within bounds
+
+Forecasts are results, not guesses
+
+#####################################################################
+
+3.7 ForecastModel (Strategy Abstraction)
+
+Models are replaceable strategies, not data.
+
+interface ForecastModel {
+  name(): string;
+  train(sales: Sale[]): TrainedModel;
+}
+
+#####################################################################
+
+3.8 TrainedModel (Domain Artifact)
+class TrainedModel {
+  constructor(
+    public readonly modelName: string,
+    public readonly trainedOn: TimePeriod
+  ) {}
+
+  predict(period: TimePeriod): Forecast {
+    // implementation delegated
+    throw new Error("Prediction not implemented");
+  }
+}
+
+
+This allows:
+
+Model versioning
+
+Reproducibility
+
+Auditability
+
+#####################################################################
+
+3.9 ModelRun (Governance Entity)
+
+Very important for enterprise trust.
+
+class ModelRun {
+  constructor(
+    public readonly modelName: string,
+    public readonly runDate: Date,
+    public readonly trainingPeriod: TimePeriod,
+    public readonly accuracyScore: number
+  ) {
+    if (accuracyScore < 0 || accuracyScore > 1) {
+      throw new Error("Accuracy score must be between 0 and 1");
+    }
+  }
+}
+
+#####################################################################
+
+3.10 ExternalIndicator (Optional but Powerful)
+class ExternalIndicator {
+  constructor(
+    public readonly name: string,
+    public readonly value: number,
+    public readonly period: TimePeriod
+  ) {}
+}
+
+Used for macro-driven forecasting (e.g., inflation, GDP,tax,exchange rates,).

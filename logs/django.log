@@ -1,0 +1,2 @@
+INFO 2026-03-27 14:44:34,587 basehttp 8328 9268 "GET /api/schema/swagger/ HTTP/1.1" 200 4647
+INFO 2026-03-27 14:44:35,852 basehttp 8328 9268 "GET /api/schema/ HTTP/1.1" 200 610549
