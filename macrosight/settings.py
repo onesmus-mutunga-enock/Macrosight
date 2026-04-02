@@ -11,7 +11,7 @@ env_path = BASE_DIR / ".env"
 if env_path.exists():
     load_dotenv(env_path)
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "unsafe-dev-secret-key-change-me")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "testme")
 
 ENVIRONMENT = os.getenv("DJANGO_ENV", "dev").lower()
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
