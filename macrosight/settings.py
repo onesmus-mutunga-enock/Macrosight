@@ -198,7 +198,7 @@ SPECTACULAR_SETTINGS = {
     "SCHEMA_PATH_PREFIX": r"/api/v1",
     "CONTACT": {"name": "MacroSight Platform lead"},
     "LICENSE": {
-        "name": "MIT License",
+        "name": "MIT cooperation  License with macrosight",
         "url": "https://opensource.org/licenses/MIT"
     },
     "TERMS_OF_SERVICE": "https://macrosight.com/terms/",
